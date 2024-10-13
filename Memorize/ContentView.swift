@@ -10,10 +10,13 @@ import SwiftUI
 
 
 struct ContentView: View {
-    let emojis = ["👻", "🎃", "🕷️", "🐈", "🐶", "🦊", "🐷"]
-    @State var cardCount: Int = 4
+    @State var emojis: Array<String> = []
+    var animal = ["🦩","🦩", "🐈", "🐶", "🦊", "🐷", "🐈", "🐶", "🦊", "🐷", "🐇", "🦨", "🦦", "🦔", "🐇", "🦨", "🦦", "🦔"]
+    let sports = ["⚽️", "🏀", "🏈", "⚾️", "🥎", "🎾", "⚽️", "🏀", "🏈", "⚾️", "🥎", "🎾"]
+    let food = ["🍏", "🍎", "🍐", "🍊", "🍋", "🍌", "🍉", "🍏", "🍎", "🍐", "🍊", "🍋", "🍌", "🍉"]
     
     var body: some View {
+        Text("Memorize!").font(.largeTitle)
         VStack(){
             ScrollView{
                 cards
@@ -26,8 +29,8 @@ struct ContentView: View {
     
     
     var cards: some View {
-        LazyVGrid(columns: [GridItem(.adaptive(minimum: 120))]) {
-            ForEach(0..<cardCount, id: \.self) { index in
+        LazyVGrid(columns: [GridItem(.adaptive(minimum: 80))]) {
+            ForEach(emojis.indices, id: \.self) { index in
                 CardView(content: emojis[index])
                     .aspectRatio(2/3, contentMode:.fit)
             }
@@ -37,35 +40,48 @@ struct ContentView: View {
     
     var cardCountAdjusters: some View {
         HStack {
-            cardRemover
             Spacer()
-            cardAdder
+            animalSwitcher
+            Spacer()
+            sportSwitcher
+            Spacer()
+            fruitSwitcher
+            Spacer()
         }
         .imageScale(.large)
         .font(.largeTitle)
     }
     
-    func cardCountAdjuster(by offset: Int, symbol: String) -> some View {
+    
+    var animalSwitcher: some View {
+        themeChooser(image: "pawprint", label: animal, systemImageName: "animals")
+    }
+
+    var sportSwitcher: some View {
+        themeChooser(image: "soccerball", label: sports, systemImageName:  "sports")
+    }
+    
+    func themeChooser(image: String, label: [String], systemImageName: String) -> some View {
         Button(action: {
-                cardCount += offset
+            emojis.removeAll()
+            emojis += label
+            emojis.shuffle()
         }, label: {
-            Image (systemName: symbol)
+            VStack{
+                Image (systemName: image)
+                Text(systemImageName).font(.footnote)
+            }
+
         })
-        .disabled(cardCount + offset < 1 || cardCount + offset > emojis.count)
     }
     
-    var cardRemover: some View {
-        cardCountAdjuster(by: -1, symbol: "rectangle.stack.badge.minus.fill")
+    var fruitSwitcher: some View {
+        themeChooser(image: "carrot", label: food, systemImageName:  "food")
     }
-    
-    var cardAdder: some View {
-        cardCountAdjuster(by: +1, symbol: "rectangle.stack.badge.plus.fill")
-    }
-    
     
     struct CardView: View {
         let content: String
-        @State var isFaceUp = true
+        @State var isFaceUp = false
         
         
         var body: some View {
